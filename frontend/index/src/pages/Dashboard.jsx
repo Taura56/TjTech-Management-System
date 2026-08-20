@@ -3,7 +3,6 @@ import DashboardCard from "./DashboardCard";
 function Dashboard(){
     return(
     <Layout title="Dashboard">
-         <h1>Dashboard</h1>
          <p>
             Welcome to the TJ Tech Management System Dashboard.
          </p>
