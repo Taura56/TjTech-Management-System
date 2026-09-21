@@ -1,0 +1,204 @@
+/* Main page container */
+.customer-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+
+/* Search input */
+.customer-header input {
+    width: 300px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 14px;
+}
+
+
+/* Add Customer button */
+.customer-header button {
+    background-color: #2563eb;
+    color: white;
+    border: none;
+    padding: 10px 18px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+
+.customer-header button:hover {
+    background-color: #1d4ed8;
+}
+
+/* Form section */
+.customer-form {
+    background: white;
+    padding: 20px;
+    margin-bottom: 20px;
+    border-radius: 10px;
+    box-shadow: 0px 2px 8px rgba(0,0,0,0.1);
+}
+
+
+.customer-form h2 {
+    margin-bottom: 15px;
+}
+
+
+/* Form inputs */
+.customer-form input {
+    display: block;
+    width: 100%;
+    max-width: 400px;
+    padding: 10px;
+    margin-bottom: 12px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+}
+
+
+/* Save and Cancel buttons */
+.customer-form button {
+    padding: 10px 18px;
+    margin-right: 10px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+
+.customer-form button:first-of-type {
+    background-color: #16a34a;
+    color: white;
+}
+
+
+.customer-form button:first-of-type:hover {
+    background-color: #15803d;
+}
+
+
+.customer-form button:last-of-type {
+    background-color: #dc2626;
+    color: white;
+}
+
+
+.customer-form button:last-of-type:hover {
+    background-color: #b91c1c;
+}
+
+/*Table container */
+.table-container {
+    width: 100%;
+    overflow-x: auto;
+    border-radius: 10px;
+}
+.customer-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 800px;
+    background-color: white;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+.customer-table th:last-child,
+.customer-table td:last-child {
+    min-width: 170px;
+    width: 170px;
+    white-space: nowrap;
+}
+.customer-table th {
+    color: white;
+    font-weight: 600;
+}
+
+
+th,
+td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+th:nth-child(1),
+td:nth-child(1) {
+    width: 18%;
+}
+
+th:nth-child(2),
+td:nth-child(2) {
+    width: 30%;
+}
+
+th:nth-child(3),
+td:nth-child(3) {
+    width: 18%;
+}
+
+th:nth-child(4),
+td:nth-child(4) {
+    width: 18%;
+}
+
+th:nth-child(5),
+td:nth-child(5) {
+    width: 16%;
+}
+
+td {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+td:last-child {
+    white-space: nowrap;
+}
+
+.edit-button,
+.delete-button {
+    width: 70px;
+    padding: 8px 0;
+    font-size: 14px;
+}
+
+/* Table row hover */
+tbody tr:hover {
+    background-color: #f1f5f9;
+}
+
+
+/* Edit button */
+.edit-button {
+    background-color: #f59e0b;
+    color: white;
+    border: none;
+    padding: 7px 14px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-right: 8px;
+}
+
+
+.edit-button:hover {
+    background-color: #d97706;
+}
+
+
+/* Delete button */
+.delete-button {
+    background-color: #ef4444;
+    color: white;
+    border: none;
+    padding: 7px 14px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+
+.delete-button:hover {
+    background-color: #dc2626;
+}

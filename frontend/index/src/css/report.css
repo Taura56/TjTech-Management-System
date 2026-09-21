@@ -1,4 +1,4 @@
-/* Report Page Styles */
+/* Report Page Styles*/
 .report-page{
     padding:20px;
     background:#f8fafc;
@@ -85,7 +85,8 @@
 
 /* Table Styles */
 .sales-report{
-    background:white;
+    width:100%;
+    background:rgb(255, 255, 255);
     padding:20px;
     border-radius:10px;
     box-shadow:0 2px 8px rgba(0,0,0,0.08);
@@ -99,14 +100,18 @@
 }
 
 
-table{
+.sales-report table{
     width:100%;
+    min-width:800px;
     border-collapse:collapse;
+    border-radius:18px;;
+    background:rgb(255, 255, 255);
 }
 
 
 th{
-    background:#f1f5f9;
+    background:#1e293b;
+    color:white;
     padding:12px;
     text-align:left;
 }
@@ -120,4 +125,9 @@ td{
 
 tr:hover{
     background:#f8fafc;
+}
+.sales-report th:last-child,
+.sales-report td:last-child{
+    min-width:180px;
+    width:180px;
 }

@@ -1,13 +1,19 @@
 import Layout from "../components/Layout";
 import "../css/sales.css";
-import { useState } from "react";
+import { useState, useEffect} from "react";
 
 function Sales() {
     // Modal state
     const [showForm, setShowForm] = useState(false);
 
     // Sales data
-    const [sales, setSales] = useState([]);
+   const [sales, setSales] = useState(() => {
+    const savedSales = localStorage.getItem("sales");
+
+    return savedSales
+        ? JSON.parse(savedSales)
+        : [];
+});
 
     // Track the sale being edited
     const [editingSale, setEditingSale] = useState(null);
@@ -19,6 +25,31 @@ function Sales() {
         quantity: 1,
         price: 0
     });
+const [products, setProducts] = useState([]);
+const [customers, setCustomers] = useState([]);
+
+useEffect(() => {
+
+    const savedProducts =
+        JSON.parse(localStorage.getItem("products")) || [];
+
+    const savedCustomers =
+        JSON.parse(localStorage.getItem("customers")) || [];
+
+    setProducts(savedProducts);
+    setCustomers(savedCustomers);
+
+}, []);
+
+useEffect(() => {
+
+    localStorage.setItem(
+        "sales",
+        JSON.stringify(sales)
+    );
+
+}, [sales]);
+
 
     // Get product price
     function getProductPrice(product) {
@@ -345,18 +376,14 @@ function Sales() {
                                         })
                                     }
                                 >
-
-                                    <option value="">
-                                        Select Customer
-                                    </option>
-
-                                    <option value="John Doe">
-                                        John Doe
-                                    </option>
-
-                                    <option value="Jane Smith">
-                                        Jane Smith
-                                    </option>
+                                    {customers.map((customer) => (
+                                        <option
+                                            key={customer.id}
+                                            value={customer.name}
+                                        >
+                                            {customer.name}
+                                        </option>
+                                    ))}
 
                                 </select>
 
@@ -380,17 +407,14 @@ function Sales() {
                                     }
                                 >
 
-                                    <option value="">
-                                        Select Product
-                                    </option>
-
-                                    <option value="Laptop">
-                                        Laptop
-                                    </option>
-
-                                    <option value="Mouse">
-                                        Mouse
-                                    </option>
+                                    {products.map((product) => (
+                                        <option
+                                            key={product.id}
+                                            value={product.name}
+                                        >
+                                            {product.name}
+                                        </option>
+                                    ))}
 
                                 </select>
 

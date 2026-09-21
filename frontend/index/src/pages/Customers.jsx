@@ -1,52 +1,97 @@
 import Layout from "../components/Layout";
 import "../css/customer.css";
-import {useState} from "react";
+import {useState, useEffect} from "react";
 function Customers(){
     const[search,setSearch] = useState("");
-    const[customers,setCustomers] = useState([
-        {
-            id: 1, name: "John Doe",
-            email: "john.doe@example.com",
-            phone: "123-456-7890",
-            location: "Los Angeles"
-        },
-        {
-            id: 2, name: "Jane Smith", 
-            email: "jane.smith@example.com",
-            phone: "098-765-4321",
-            location: "New York"
-        }
-    ]);
-    const [newCustomer, setNewCustomer] = useState({
+    const [customers, setCustomers] = useState(() => {
+
+    const savedCustomers = localStorage.getItem("customers");
+
+    return savedCustomers
+        ? JSON.parse(savedCustomers)
+        : [
+            {
+                id: 1,
+                name: "John Doe",
+                email: "john.doe@example.com",
+                phone: "123-456-7890",
+                location: "Los Angeles"
+            },
+            {
+                id: 2,
+                name: "Jane Smith",
+                email: "jane.smith@example.com",
+                phone: "098-765-4321",
+                location: "New York"
+            }
+        ];
+});
+useEffect(() => {
+
+    localStorage.setItem(
+        "customers",
+        JSON.stringify(customers)
+    );
+
+}, [customers]);
+const [newCustomer, setNewCustomer] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    location: ""
+});
+    const handleAddcustomer = () => {
+        
+
+    if(
+        !newCustomer.name ||
+        !newCustomer.email ||
+        !newCustomer.phone ||
+        !newCustomer.location
+    )
+    {
+        alert("Please fill in all fields.");
+        return;
+    }
+
+
+    if(editingCustomer){
+
+        // UPDATE CUSTOMER
+        const updatedCustomers = customers.map((customer) =>
+            customer.id === editingCustomer.id
+            ? {
+                ...customer,
+                ...newCustomer
+              }
+            : customer
+        );
+
+        setCustomers(updatedCustomers);
+
+    }else{
+
+        // ADD NEW CUSTOMER
+        const customer = {
+            id: customers.length + 1,
+            ...newCustomer
+        };
+
+        setCustomers([...customers, customer]);
+    }
+
+
+    // Clear form after save/update
+    setNewCustomer({
         name: "",
         email: "",
         phone: "",
         location: ""
     });
-    const handleAddcustomer = () => {
-        if(
-            !newCustomer.name ||
-            !newCustomer.email ||
-            !newCustomer.phone ||
-            !newCustomer.location
-        )
-        {
-            alert("Please fill in all fields.");
-            return;
-        }
-        const customer = {
-            id: customers.length + 1,
-           ...newCustomer
-        };
-        setCustomers([...customers, customer]);
-        setNewCustomer({
-            name: "",
-            email: "",
-            phone: "",
-            location: ""
-        });
-        setShowForm(false);
-    };
+
+    setEditingCustomer(null);
+    setShowForm(false);
+};
     const [showForm, setShowForm] = useState(false);
     const handleDeleteCustomer = (id) => {
         if(window.confirm("Are you sure you want to delete this customer?")){
@@ -115,39 +160,42 @@ function Customers(){
                     </div>
                 )}
             </div>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Name</th>
-                        <th>Email</th>
-                        <th>Phone</th>
-                        <th>Location</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {customers.filter((customer) => customer.name.toLowerCase().includes(search.toLowerCase()))
-                    .map((customer) => (
-                        <tr key={customer.id}>
-                            <td>{customer.name}</td>
-                            <td>{customer.email}</td>
-                            <td>{customer.phone}</td>
-                            <td>{customer.location}</td>
-
-                            <td>
-                                <button className="edit-button" 
-                                    onClick={()=>handleEditCustomer(customer)}>
-                                    Edit
-                                </button>
-                                <button className="delete-button"
-                                    onClick={()=>handleDeleteCustomer(customer.id)}>
-                                    Delete
-                                </button>
-                            </td>   
+            <div className="table-container">
+                <table className="customer-table">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Phone</th>
+                            <th>Location</th>
+                            <th>Actions</th>
                         </tr>
-                        
-                    ))}
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        {customers.filter((customer) => customer.name.toLowerCase().includes(search.toLowerCase()))
+                        .map((customer) => (
+                            <tr key={customer.id}>
+                                <td>{customer.name}</td>
+                                <td>{customer.email}</td>
+                                <td>{customer.phone}</td>
+                                <td>{customer.location}</td>
+
+                                <td>
+                                    <button className="edit-button" 
+                                        onClick={()=>handleEditCustomer(customer)}>
+                                        Edit
+                                    </button>
+                                    <button className="delete-button"
+                                        onClick={()=>handleDeleteCustomer(customer.id)}>
+                                        Delete
+                                    </button>
+                                </td>   
+                            </tr>
+                            
+                        ))}
+                    </tbody>
+                </table>
+            </div>
         </Layout>
     );
 }

@@ -1,40 +1,60 @@
 import Layout from "../components/Layout";
 import "../css/products.css";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 function Products(){
     const[search,setSearch] = useState("");
-    const [products, setProducts] = useState([
-        { 
-            id: 1, 
-            name: "Laptop",
-            category: "Electronics",
-            price: 850, 
-            stock: 15 
-        },
-        { 
-            id: 2, 
-            name: "Mouse", 
-            category: "Electronics", 
-            price: 25, 
-            stock: 50 
-        }
-    ]);
+    const [products, setProducts] = useState(() => {
+        const savedProducts = localStorage.getItem("products");
+        return savedProducts ? JSON.parse(savedProducts) : [
+                { 
+                    id: 1, 
+                    name: "Laptop",
+                    category: "Electronics",
+                    supplier: "TechStore",
+                buyingPrice: 700,
+                sellingPrice: 850,
+                stock: 15,
+                status: "In Stock"
+            },
+            { 
+                id: 2, 
+                name: "Mouse", 
+                category: "Electronics", 
+                supplier: "TechStore",
+                buyingPrice: 10,
+                sellingPrice: 25,
+                stock: 50,
+                status: "In Stock"
+            }
+        ];
+    });
     const [newProduct, setNewProduct] = useState({
         id: "",
         name: "",
         category: "",
-        price: "",
-        stock: ""
+        supplier: "",
+        buyingPrice: "",
+        sellingPrice: "",
+        stock: "",
+        status: ""
     }); 
     const[showForm, setShowForm] = useState(false);
+    useEffect(() => {
+        localStorage.setItem(
+            "products",
+             JSON.stringify(products)
+            );
+        }, [products]);
 
     const handleAddProduct = () => {
         if(
             !newProduct.name||
             !newProduct.category||
-            !newProduct.price||
-           ! newProduct.stock)
-           {
+            !newProduct.buyingPrice||
+            !newProduct.sellingPrice||
+            !newProduct.stock||
+            !newProduct.supplier
+        ) {
             alert("Please fill in all fields");
             return;
            }
@@ -42,8 +62,13 @@ function Products(){
             id:products.length+1,
             name:newProduct.name,
             category:newProduct.category,
-            price:newProduct.price,
-            stock:newProduct.stock
+            supplier:newProduct.supplier,
+            buyingPrice:newProduct.buyingPrice,
+            sellingPrice:newProduct.sellingPrice,
+            stock:newProduct.stock,
+            status:newProduct.stock>10?"In Stock"
+            :newProduct.stock>0?"Low Stock"
+            :"Out of Stock"
            };
         
           setProducts([...products, product]);
@@ -51,8 +76,11 @@ function Products(){
                 id: "", 
                 name: "", 
                 category: "", 
-                price: "", 
-                stock: "" 
+                supplier: "",
+                buyingPrice: "",
+                sellingPrice: "",
+                stock: "",
+                status: ""
             });
             setShowForm(false);
         
@@ -61,8 +89,11 @@ function Products(){
     const[editingProduct, setEditingproduct] = useState({
         name:"",
         category:"",
-        price:"",
-        stock:""
+        supplier:"",
+        buyingPrice:"",
+        sellingPrice:"",
+        stock:"",
+        status:""
     });
     const handleEdit=(product) => {
         console.log(product);
@@ -75,8 +106,11 @@ function Products(){
     if (
         !editingProduct.name ||
         !editingProduct.category ||
-        !editingProduct.price ||
-        !editingProduct.stock
+        !editingProduct.supplier ||
+        !editingProduct.buyingPrice ||
+        !editingProduct.sellingPrice ||
+        !editingProduct.stock ||
+        !editingProduct.status
     ) {
         alert("Please fill in all fields");
         return;
@@ -93,8 +127,11 @@ function Products(){
     setEditingproduct({
         name: "",
         category: "",
-        price: "",
-        stock: ""
+        supplier: "",
+        buyingPrice: "",
+        sellingPrice: "",
+        stock: "",
+        status: ""
     });
 
     setShowForm(false);};
@@ -115,15 +152,21 @@ const handleDeleteProduct = (productId) => {
                                         setEditingproduct({
                                             name:"",
                                             category:"",
-                                            price:"",
-                                            stock:""
+                                            supplier:"",
+                                            buyingPrice:"",
+                                            sellingPrice:"",
+                                            stock:"",
+                                            status:""
                                         })
                                         setNewProduct({
                                             id: "",
                                             name: "",
                                             category: "",
-                                            price: "",
-                                            stock: ""
+                                            supplier: "",
+                                            buyingPrice: "",
+                                            sellingPrice: "",
+                                            stock: "",
+                                            status: ""
                                         })
                                         setShowForm(true)}
                                     }>
@@ -152,10 +195,17 @@ const handleDeleteProduct = (productId) => {
                             onChange={(e) =>{if(editingId){setEditingproduct({...editingProduct, category: e.target.value})}
                                                 else{setNewProduct({...newProduct, category: e.target.value})}}}
                             />
-
-                            <input type="number" placeholder="Price" value={editingId ? editingProduct.price : newProduct.price}
-                                onChange={(e) =>{if(editingId){setEditingproduct({...editingProduct, price: parseFloat(e.target.value) || 0})}
-                                                    else{setNewProduct({...newProduct, price: parseFloat(e.target.value) || 0})}}}
+                            <input type="text" placeholder="Supplier" value={editingId ? editingProduct.supplier : newProduct.supplier}
+                                onChange={(e) =>{if(editingId){setEditingproduct({...editingProduct, supplier: e.target.value})}
+                                                else{setNewProduct({...newProduct, supplier: e.target.value})}}}
+                            />
+                            <input type="number" placeholder="Buying Price" value={editingId ? editingProduct.buyingPrice : newProduct.buyingPrice}
+                                onChange={(e) =>{if(editingId){setEditingproduct({...editingProduct, buyingPrice: parseFloat(e.target.value) || 0})}
+                                                    else{setNewProduct({...newProduct, buyingPrice: parseFloat(e.target.value) || 0})}}}
+                            />
+                            <input type="number" placeholder="Selling Price" value={editingId ? editingProduct.sellingPrice : newProduct.sellingPrice}
+                                onChange={(e) =>{if(editingId){setEditingproduct({...editingProduct, sellingPrice: parseFloat(e.target.value) || 0})}
+                                                    else{setNewProduct({...newProduct, sellingPrice: parseFloat(e.target.value) || 0})}}}
                             />
 
                             <input type="number" placeholder="Stock" value={editingId ? editingProduct.stock : newProduct.stock}
@@ -171,12 +221,25 @@ const handleDeleteProduct = (productId) => {
                                 <button className="cancel-btn"
                                     onClick={() => {
                                         setShowForm(false);
+                                        setEditingId(null);
+                                        setEditingproduct({
+                                            name: "",
+                                            category: "",   
+                                            supplier: "",
+                                            buyingPrice: "",
+                                            sellingPrice: "",
+                                            stock: "",
+                                            status: ""
+                                        });
                                         setNewProduct({
                                             id: "",
                                             name: "",
                                             category: "",
-                                            price: "",
-                                            stock: ""
+                                            supplier: "",
+                                            buyingPrice: "",
+                                            sellingPrice: "",
+                                            stock: "",
+                                            status: ""
                                         }); 
                                     }}>Cancel
                                 </button>
@@ -185,42 +248,54 @@ const handleDeleteProduct = (productId) => {
                     </div>
                 </div>
             )}
+            <div className="products-table">
         
-        <table className="products-table">
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Product</th>
-                    <th>Category</th>
-                    <th>Price</th>
-                    <th>Stock</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                {products.filter((product) => 
-                    product.name.toLowerCase().includes(search.toLowerCase()) ||
-                    product.category.toLowerCase().includes(search.toLowerCase()))
-                    .map((product) => (
-                        <tr key={product.id}>
-                            <td>{product.id}</td>
-                            <td>{product.name}</td>
-                            <td>{product.category}</td>
-                            <td>${product.price.toFixed(2)}</td>
-                            <td>{product.stock}</td>
-                            <td>
-                                <button className="edit-btn" onClick={() => handleEdit(product)}>
-                                    Edit
-                                </button>
-                                <button className="delete-btn" onClick={() => handleDeleteProduct(product.id)}>
-                                    Delete
-                                </button>
-                            </td>
+                <table >
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Product</th>
+                            <th>Category</th>
+                            <th>Supplier</th>
+                            <th>Buying Price</th>
+                            <th>Selling Price</th>
+                            <th>Stock</th>
+                            <th>Status</th>
+                            <th>Actions</th>
                         </tr>
-                    )
-                )}
-            </tbody>
-        </table>
+                    </thead>
+                    <tbody>
+                        {products.filter((product) => 
+                            product.name.toLowerCase().includes(search.toLowerCase()) ||
+                            product.category.toLowerCase().includes(search.toLowerCase()))
+                            .map((product) => (
+                                <tr key={product.id}>
+                                    <td>{product.id}</td>
+                                    <td>{product.name}</td>
+                                    <td>{product.category}</td>
+                                    <td>{product.supplier}</td>
+                                    <td>${product.buyingPrice.toFixed(2)}</td>
+                                    <td>${product.sellingPrice.toFixed(2)}</td>
+                                    <td>{product.stock}</td>
+                                    <td>{product.stock >10?(<span className="in-stock">In Stock</span>
+                                            ):product.stock >0?(<span className="low-stock">Low Stock</span>
+                                            ):(<span className="out-of-stock">Out of Stock</span>
+                                        )}
+                                    </td>
+                                    <td className="action-buttons">
+                                        <button className="edit-btn" onClick={() => handleEdit(product)}>
+                                            Edit
+                                        </button>
+                                        <button className="delete-btn" onClick={() => handleDeleteProduct(product.id)}>
+                                            Delete
+                                        </button>
+                                    </td>
+                                </tr>
+                            )
+                        )}
+                    </tbody>
+                </table>
+            </div>
     </div>
 </Layout>
 );
