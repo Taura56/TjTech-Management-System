@@ -3,13 +3,15 @@ const cors = require("cors");
 const dotenv = require("dotenv");
 const connectDB = require("./config/db");
 const Stock = require("./models/stock");
+const Customer = require("./models/customer");
+const Sale = require("./models/sale");
 
 dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-app.use(cors());
+app.use(cors({ origin: true, credentials: true }));
 app.use(express.json());
 
 connectDB();
@@ -181,6 +183,104 @@ app.delete("/api/stocks/:id", async (req, res) => {
   }
 });
 
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+app.get("/api/customers", async (req, res) => {
+  try {
+    const customers = await Customer.find().sort({ createdAt: -1 });
+    res.status(200).json(customers);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+app.post("/api/customers", async (req, res) => {
+  try {
+    const customer = await Customer.create(req.body);
+    res.status(201).json(customer);
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+});
+
+app.put("/api/customers/:id", async (req, res) => {
+  try {
+    const updated = await Customer.findByIdAndUpdate(req.params.id, req.body, {
+      new: true,
+      runValidators: true,
+    });
+
+    if (!updated) {
+      return res.status(404).json({ message: "Customer not found" });
+    }
+
+    res.status(200).json(updated);
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+});
+
+app.delete("/api/customers/:id", async (req, res) => {
+  try {
+    const deleted = await Customer.findByIdAndDelete(req.params.id);
+
+    if (!deleted) {
+      return res.status(404).json({ message: "Customer not found" });
+    }
+
+    res.status(200).json({ message: "Customer deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+app.get("/api/sales", async (req, res) => {
+  try {
+    const sales = await Sale.find().sort({ createdAt: -1 });
+    res.status(200).json(sales);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+app.post("/api/sales", async (req, res) => {
+  try {
+    const sale = await Sale.create(req.body);
+    res.status(201).json(sale);
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+});
+
+app.put("/api/sales/:id", async (req, res) => {
+  try {
+    const updated = await Sale.findByIdAndUpdate(req.params.id, req.body, {
+      new: true,
+      runValidators: true,
+    });
+
+    if (!updated) {
+      return res.status(404).json({ message: "Sale not found" });
+    }
+
+    res.status(200).json(updated);
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+});
+
+app.delete("/api/sales/:id", async (req, res) => {
+  try {
+    const deleted = await Sale.findByIdAndDelete(req.params.id);
+
+    if (!deleted) {
+      return res.status(404).json({ message: "Sale not found" });
+    }
+
+    res.status(200).json({ message: "Sale deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+app.listen(PORT, "0.0.0.0", () => {
+  console.log(`Server is running on http://0.0.0.0:${PORT}`);
 });
