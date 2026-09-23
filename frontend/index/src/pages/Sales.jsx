@@ -26,7 +26,7 @@ const [newSale, setNewSale] = useState({
     price: 0,
     payment: "",
     phone: "",
-    transactioncode: "",
+    transactionCode: "",
     paymentstatus: ""
 });
 const [products, setProducts] = useState([]);
@@ -80,8 +80,8 @@ useEffect(() => {
             price: 0,
             payment: "",
             phone: "",
-            transactioncode: "",
-            paymentstatus: ""
+            transactionCode: "",
+            paymentstatus: "Pending"
         });
 
         setShowForm(true);
@@ -96,7 +96,7 @@ useEffect(() => {
             price: sale.price,
             payment: sale.payment,
             phone: sale.phone,
-            transactioncode: sale.transactioncode,
+            transactionCode: sale.transactionCode,
             paymentstatus: sale.paymentstatus
         });
 
@@ -106,20 +106,39 @@ useEffect(() => {
 
     // Save new sale or update existing sale
     function handleSaveSale() {
-        if (
-            !newSale.customer ||
-            !newSale.product ||
-            !newSale.payment ||
-            !newSale.phone ||
-            !newSale.transactioncode ||
-            !newSale.paymentstatus ||
-            newSale.quantity <= 0
-        ) {
-            alert("Please fill in all fields.");
-            return;
-        }
+                   if (
+                        !newSale.customer ||
+                        !newSale.product ||
+                        !newSale.payment ||
+                        newSale.quantity <= 0
+                    ) {
+                        alert("Please fill in all fields.");
+                        return;
+                        }
 
+
+                    if (
+                         newSale.payment === "M-Pesa" &&
+                        !newSale.phone
+                        ) {
+                             alert("Please enter M-Pesa phone number.");
+                             return;
+                            }
+
+
+                            if (
+                                newSale.payment === "Card" &&
+                                !newSale.transactionCode
+                            ) {
+                                alert("Please enter card reference.");
+                                return;
+                            }
         const price = getProductPrice(newSale.product);
+        let paymentStatus = "Paid";
+            if(newSale.payment === "M-Pesa" || newSale.payment === "Card"){
+                paymentStatus = "Pending";
+            }
+
             const selectedProduct = products.find(
                 (product) => product.name === newSale.product
             );
@@ -129,31 +148,40 @@ useEffect(() => {
                 return;
             }
 
-            if (newSale.quantity > selectedProduct.stock) {
-                alert("Not enough stock available.");
-                return;
-            }
+            if (!editingSale && newSale.quantity > selectedProduct.stock) {
+                            alert("Not enough stock available.");
+                            return;
+             }
 
-        // UPDATE EXISTING SALE
         // UPDATE EXISTING SALE
 if (editingSale) {
 
-    const oldQuantity = editingSale.quantity;
-    const newQuantity = newSale.quantity;
+    const oldProduct = products.find(
+        (product) => product.name === editingSale.product
+    );
 
-
-    // Calculate difference
-    const quantityDifference = newQuantity - oldQuantity;
-
-
-    // Update stock
     const updatedProducts = products.map((product) => {
 
+        // Return stock to old product
+        if (product.name === editingSale.product) {
+
+            return {
+                ...product,
+                stock: Number(product.stock) + Number(editingSale.quantity)
+            };
+
+        }
+
+        return product;
+
+    }).map((product) => {
+
+        // Remove stock from new product
         if (product.name === newSale.product) {
 
             return {
                 ...product,
-                stock: product.stock - quantityDifference
+                stock: Number(product.stock) - Number(newSale.quantity)
             };
 
         }
@@ -171,35 +199,39 @@ if (editingSale) {
     );
 
 
-                // Update sale record
-                const updatedSales = sales.map((sale) => {
+    // Update sale
+    const updatedSales = sales.map((sale) => {
 
-                    if (sale.id === editingSale.id) {
+        if (sale.id === editingSale.id) {
 
-                        return {
-                            ...sale,
-                            customer: newSale.customer,
-                            product: newSale.product,
-                            quantity: newQuantity,
-                            price: price,
-                            total: price * newQuantity,
-                            payment: newSale.payment,
-                            phone: newSale.phone,
-                            transactioncode: newSale.transactioncode,
-                            paymentstatus: newSale.paymentstatus
-                        };
+            return {
+                ...sale,
+                customer: newSale.customer,
+                product: newSale.product,
+                quantity: newSale.quantity,
+                price: price,
+                total: price * newSale.quantity,
+                payment: newSale.payment,
+                phone: newSale.phone,
+                transactionCode: newSale.transactionCode,
+                paymentstatus: paymentStatus
+            };
 
-                    }
+        }
 
-                    return sale;
+        return sale;
 
-                });
+    });
 
 
-                setSales(updatedSales);
+    setSales(updatedSales);
 
-    
-        } else {
+    localStorage.setItem(
+        "sales",
+        JSON.stringify(updatedSales)
+    );
+
+}else {
             // ADD NEW SALE
 
             const newId =
@@ -216,8 +248,8 @@ if (editingSale) {
                 total: price * newSale.quantity,
                 payment: newSale.payment,
                 phone: newSale.phone,
-                transactioncode: newSale.transactioncode,
-                paymentstatus: newSale.paymentstatus,
+                transactionCode: newSale.transactionCode,
+                paymentstatus: paymentStatus,
                 date: new Date().toLocaleDateString()
             };
 
@@ -255,8 +287,8 @@ if (editingSale) {
             price: 0,
             payment: "",
             phone: "",
-            transactioncode: "",
-            paymentstatus: ""
+            transactionCode: "",
+            paymentstatus: "Pending"
         });
 
         setEditingSale(null);
@@ -325,8 +357,8 @@ if (editingSale) {
             price: 0,
             payment: "",
             phone: "",
-            transactioncode: "",
-            paymentstatus: ""
+            transactionCode: "",
+            paymentstatus: "Pending"
         });
 
         setEditingSale(null);
@@ -411,6 +443,8 @@ if (editingSale) {
                                 <th>Price</th>
                                 <th>Total</th>
                                 <th>Payment</th>
+                                <th>Payment Status</th>
+                                <th>Transaction Code</th>
                                 <th>Date</th>
                                 <th>Actions</th>
                             </tr>
@@ -421,7 +455,7 @@ if (editingSale) {
                             {sales.length === 0 ? (
 
                                 <tr>
-                                    <td colSpan="9">
+                                    <td colSpan="11">
                                         No sales data available.
                                     </td>
                                 </tr>
@@ -455,6 +489,12 @@ if (editingSale) {
                                         </td>
                                         <td>
                                             {sale.payment}
+                                        </td>
+                                        <td>
+                                            {sale.paymentstatus}
+                                        </td>
+                                        <td>
+                                            {sale.transactionCode ||sale.phone} 
                                         </td>
 
                                         <td>
