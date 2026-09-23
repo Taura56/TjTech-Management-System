@@ -26,8 +26,8 @@ const [newSale, setNewSale] = useState({
     price: 0,
     payment: "",
     phone: "",
-    transactionCode: "",
-    paymentStatus: "Pending"
+    transactioncode: "",
+    paymentstatus: ""
 });
 const [products, setProducts] = useState([]);
 const [customers, setCustomers] = useState([]);
@@ -80,8 +80,8 @@ useEffect(() => {
             price: 0,
             payment: "",
             phone: "",
-            transactionCode: "",
-            paymentStatus: "Pending"
+            transactioncode: "",
+            paymentstatus: ""
         });
 
         setShowForm(true);
@@ -96,8 +96,8 @@ useEffect(() => {
             price: sale.price,
             payment: sale.payment,
             phone: sale.phone,
-            transactionCode: sale.transactionCode,
-            paymentStatus: sale.paymentStatus
+            transactioncode: sale.transactioncode,
+            paymentstatus: sale.paymentstatus
         });
 
         setEditingSale(sale);
@@ -105,30 +105,17 @@ useEffect(() => {
     }
 
     // Save new sale or update existing sale
-    function handleSaveSale() {  
+    function handleSaveSale() {
         if (
             !newSale.customer ||
             !newSale.product ||
             !newSale.payment ||
+            !newSale.phone ||
+            !newSale.transactioncode ||
+            !newSale.paymentstatus ||
             newSale.quantity <= 0
         ) {
             alert("Please fill in all fields.");
-            return;
-        }
-        //Requre phone number for M-Pesa payment
-        if (
-            newSale.payment === "M-Pesa" &&
-            !newSale.phone
-        ) {
-            alert("Phone number is required for M-Pesa payment.");
-            return;
-        }
-        // Require transaction code for Card payment
-        if (
-            newSale.payment === "Card" &&
-            !newSale.transactionCode
-        ) {
-            alert("Transaction code is required for Card payment.");
             return;
         }
 
@@ -198,8 +185,8 @@ if (editingSale) {
                             total: price * newQuantity,
                             payment: newSale.payment,
                             phone: newSale.phone,
-                            transactionCode: newSale.transactionCode,
-                            paymentStatus: newSale.paymentStatus
+                            transactioncode: newSale.transactioncode,
+                            paymentstatus: newSale.paymentstatus
                         };
 
                     }
@@ -229,8 +216,8 @@ if (editingSale) {
                 total: price * newSale.quantity,
                 payment: newSale.payment,
                 phone: newSale.phone,
-                transactionCode: newSale.transactionCode,
-                paymentStatus: "paid",
+                transactioncode: newSale.transactioncode,
+                paymentstatus: newSale.paymentstatus,
                 date: new Date().toLocaleDateString()
             };
 
@@ -268,8 +255,8 @@ if (editingSale) {
             price: 0,
             payment: "",
             phone: "",
-            transactionCode: "",
-            paymentStatus: ""
+            transactioncode: "",
+            paymentstatus: ""
         });
 
         setEditingSale(null);
@@ -338,8 +325,8 @@ if (editingSale) {
             price: 0,
             payment: "",
             phone: "",
-            transactionCode: "",
-            paymentStatus: ""
+            transactioncode: "",
+            paymentstatus: ""
         });
 
         setEditingSale(null);
@@ -424,8 +411,6 @@ if (editingSale) {
                                 <th>Price</th>
                                 <th>Total</th>
                                 <th>Payment</th>
-                                <th>Phone/Reference</th>
-                                <th>Payment Status</th>
                                 <th>Date</th>
                                 <th>Actions</th>
                             </tr>
@@ -436,7 +421,7 @@ if (editingSale) {
                             {sales.length === 0 ? (
 
                                 <tr>
-                                    <td colSpan="11">
+                                    <td colSpan="9">
                                         No sales data available.
                                     </td>
                                 </tr>
@@ -468,19 +453,10 @@ if (editingSale) {
                                         <td>
                                             KSh {sale.total}
                                         </td>
-
                                         <td>
                                             {sale.payment}
                                         </td>
 
-                                        <td>
-                                            {sale.phone||sale.transactionCode}
-                                        </td>
-
-                                        <td>
-                                            {sale.paymentStatus}
-                                        </td>
-                                        
                                         <td>
                                             {sale.date}
                                         </td>
@@ -624,7 +600,7 @@ if (editingSale) {
                                         })
                                     }
                                 />
-                            </div>
+
                                 {/* PAYMENT METHOD */}
 
                                         <div className="form-group">
@@ -663,7 +639,7 @@ if (editingSale) {
 
                                         </div>
 
-                            {/* PAYMENT FIELD for MPESA */}
+                            </div>{/* PAYMENT FIELD for MPESA */}
                                     {newSale.payment === "M-Pesa" && (
                                         <div className="form-group">
                                             <label>Phone Number</label>
@@ -681,9 +657,7 @@ if (editingSale) {
                                             />
                                         </div>
                                     )}
-                                    
-                                         {/*PAYMENT FIELD for CARD */}  
-                                          {newSale.payment === "Card" && (
+                                            {newSale.payment === "Card" && (
                                                 <div className="form-group">
                                                     <label>Card Reference</label>
 

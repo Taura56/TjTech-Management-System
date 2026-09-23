@@ -1,32 +1,13 @@
 import Layout from "../components/Layout";
 import "../css/products.css";
 import { useState, useEffect } from "react";
+import { fetchStocks, addStock, updateStock, deleteStock } from "../Services/api";
+
 function Products(){
     const[search,setSearch] = useState("");
     const [products, setProducts] = useState(() => {
         const savedProducts = localStorage.getItem("products");
-        return savedProducts ? JSON.parse(savedProducts) : [
-                { 
-                    id: 1, 
-                    name: "Laptop",
-                    category: "Electronics",
-                    supplier: "TechStore",
-                buyingPrice: 700,
-                sellingPrice: 850,
-                stock: 15,
-                status: "In Stock"
-            },
-            { 
-                id: 2, 
-                name: "Mouse", 
-                category: "Electronics", 
-                supplier: "TechStore",
-                buyingPrice: 10,
-                sellingPrice: 25,
-                stock: 50,
-                status: "In Stock"
-            }
-        ];
+        return savedProducts ? JSON.parse(savedProducts) : [];
     });
     const [newProduct, setNewProduct] = useState({
         id: "",
@@ -39,6 +20,22 @@ function Products(){
         status: ""
     }); 
     const[showForm, setShowForm] = useState(false);
+
+    useEffect(() => {
+        const loadProducts = async () => {
+            try {
+                const backendProducts = await fetchStocks();
+                setProducts(backendProducts);
+                localStorage.setItem("products", JSON.stringify(backendProducts));
+            } catch (error) {
+                const savedProducts = JSON.parse(localStorage.getItem("products")) || [];
+                setProducts(savedProducts);
+            }
+        };
+
+        loadProducts();
+    }, []);
+
     useEffect(() => {
         localStorage.setItem(
             "products",
@@ -46,7 +43,7 @@ function Products(){
             );
         }, [products]);
 
-    const handleAddProduct = () => {
+    const handleAddProduct = async () => {
         if(
             !newProduct.name||
             !newProduct.category||
@@ -70,8 +67,17 @@ function Products(){
             :newProduct.stock>0?"Low Stock"
             :"Out of Stock"
            };
-        
-          setProducts([...products, product]);
+
+           try {
+             const savedProduct = await addStock(product);
+             const updatedProducts = [...products, savedProduct];
+             setProducts(updatedProducts);
+             localStorage.setItem("products", JSON.stringify(updatedProducts));
+           } catch (error) {
+             alert(error.message || "Unable to save product");
+             return;
+           }
+
             setNewProduct({ 
                 id: "", 
                 name: "", 
@@ -101,7 +107,7 @@ function Products(){
         setEditingproduct(product);
         setShowForm(true);}
 
-        const handleUpdateProduct = () => {
+        const handleUpdateProduct = async () => {
 
     if (
         !editingProduct.name ||
@@ -116,11 +122,18 @@ function Products(){
         return;
     }
 
-    const updatedProducts = products.map((product) =>
-        product.id === editingId ? editingProduct : product
-    );
+    try {
+        const updatedProduct = await updateStock(editingId, editingProduct);
+        const updatedProducts = products.map((product) =>
+            product.id === editingId ? updatedProduct : product
+        );
 
-    setProducts(updatedProducts);
+        setProducts(updatedProducts);
+        localStorage.setItem("products", JSON.stringify(updatedProducts));
+    } catch (error) {
+        alert(error.message || "Unable to update product");
+        return;
+    }
 
     setEditingId(null);
 
@@ -137,11 +150,18 @@ function Products(){
     setShowForm(false);};
 
 //DELETE PRODUCT FUNCTION
-const handleDeleteProduct = (productId) => {
+const handleDeleteProduct = async (productId) => {
     const confirmDelete = window.confirm("Are you sure you want to delete this product?");
     if(!confirmDelete){ return;}
-    const updatedProducts = products.filter((product) => product.id !== productId);
-    setProducts(updatedProducts);
+
+    try {
+        await deleteStock(productId);
+        const updatedProducts = products.filter((product) => product.id !== productId);
+        setProducts(updatedProducts);
+        localStorage.setItem("products", JSON.stringify(updatedProducts));
+    } catch (error) {
+        alert(error.message || "Unable to delete product");
+    }
 };
     return(
    <Layout title="Products">
