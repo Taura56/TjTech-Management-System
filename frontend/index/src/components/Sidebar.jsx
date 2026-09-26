@@ -8,17 +8,25 @@ function Sidebar(){
                 <li>
                     <NavLink to="/">Dashboard</NavLink>
                 </li>
+                                <li>
+                    <NavLink to="/services">Services</NavLink>
+                </li>
                 <li>
                     <NavLink to="/products">Products</NavLink>
                 </li>
                 <li>
                     <NavLink to="/customers">Customers</NavLink>
                 </li>
-                <li>
-                    <NavLink to="/reports">Reports</NavLink>
-                </li>
+                
                 <li>
                     <NavLink to="/sales">Sales</NavLink>
+                </li>
+
+                <li>
+                    <NavLink to="/payments">Payments</NavLink>
+                </li>
+                <li>
+                    <NavLink to="/reports">Reports</NavLink>
                 </li>
             </ul>
         </div>
