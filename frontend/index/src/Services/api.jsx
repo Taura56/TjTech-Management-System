@@ -9,6 +9,7 @@ const API_BASE = (() => {
 const STOCK_URL = `${API_BASE}/api/stocks`;
 const CUSTOMER_URL = `${API_BASE}/api/customers`;
 const SALE_URL = `${API_BASE}/api/sales`;
+const SERVICE_URL = `${API_BASE}/api/services`;
 
 const normalizeProduct = (item) => {
     const descriptionText = item.description || "";
@@ -46,7 +47,21 @@ const normalizeSale = (item) => ({
     quantity: Number(item.quantity ?? 0),
     price: Number(item.price ?? 0),
     total: Number(item.total ?? 0),
+    payment: item.payment || "Cash",
+    phone: item.phone || "",
+    transactionCode: item.transactionCode || "",
+    paymentstatus: item.paymentstatus || "Pending",
     date: item.date || new Date().toLocaleDateString(),
+    _id: item._id || item.id,
+});
+
+const normalizeService = (item) => ({
+    id: item._id || item.id,
+    name: item.name,
+    category: item.category,
+    price: Number(item.price ?? 0),
+    description: item.description || "",
+    status: item.status || "Available",
     _id: item._id || item.id,
 });
 
@@ -112,6 +127,78 @@ export const deleteStock = async (id) => {
     if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
         throw new Error(errorData.message || "Unable to delete stock item");
+    }
+
+    return true;
+};
+
+export const fetchServices = async () => {
+    const response = await fetch(SERVICE_URL);
+
+    if (!response.ok) {
+        throw new Error("Unable to fetch service data");
+    }
+
+    const serviceData = await response.json();
+    return serviceData.map(normalizeService);
+};
+
+export const addService = async (service) => {
+    const response = await fetch(SERVICE_URL, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            name: service.name,
+            category: service.category,
+            price: Number(service.price ?? 0),
+            description: service.description || "",
+            status: service.status || "Available"
+        })
+    });
+
+    if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || "Unable to add service");
+    }
+
+    const result = await response.json();
+    return normalizeService(result);
+};
+
+export const updateService = async (id, service) => {
+    const response = await fetch(`${SERVICE_URL}/${id}`, {
+        method: "PUT",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            name: service.name,
+            category: service.category,
+            price: Number(service.price ?? 0),
+            description: service.description || "",
+            status: service.status || "Available"
+        })
+    });
+
+    if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || "Unable to update service");
+    }
+
+    const result = await response.json();
+    return normalizeService(result);
+};
+
+export const deleteService = async (id) => {
+    const response = await fetch(`${SERVICE_URL}/${id}`, {
+        method: "DELETE"
+    });
+
+    if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || "Unable to delete service");
     }
 
     return true;
@@ -200,6 +287,10 @@ export const addSale = async (sale) => {
             quantity: Number(sale.quantity ?? 0),
             price: Number(sale.price ?? 0),
             total: Number(sale.total ?? (Number(sale.price ?? 0) * Number(sale.quantity ?? 0))),
+            payment: sale.payment || "Cash",
+            phone: sale.phone || "",
+            transactionCode: sale.transactionCode || "",
+            paymentstatus: sale.paymentstatus || "Pending",
             date: sale.date || new Date().toLocaleDateString()
         })
     });
@@ -225,6 +316,10 @@ export const updateSale = async (id, sale) => {
             quantity: Number(sale.quantity ?? 0),
             price: Number(sale.price ?? 0),
             total: Number(sale.total ?? (Number(sale.price ?? 0) * Number(sale.quantity ?? 0))),
+            payment: sale.payment || "Cash",
+            phone: sale.phone || "",
+            transactionCode: sale.transactionCode || "",
+            paymentstatus: sale.paymentstatus || "Pending",
             date: sale.date || new Date().toLocaleDateString()
         })
     });

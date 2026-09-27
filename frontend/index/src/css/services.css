@@ -1,0 +1,17 @@
+.services-page {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.services-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.service-modal {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}

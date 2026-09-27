@@ -1,126 +1,178 @@
-import Layout from "../components/Layout";
+﻿import Layout from "../components/Layout";
 import "../css/sales.css";
 import { useState, useEffect } from "react";
-import { fetchSales, addSale, updateSale, deleteSale, fetchCustomers, fetchStocks } from "../Services/api";
+import {
+    fetchStocks,
+    fetchCustomers,
+    fetchSales,
+    addSale,
+    updateSale,
+    deleteSale,
+} from "../Services/api";
 
 function Sales() {
     const [showForm, setShowForm] = useState(false);
-    const [sales, setSales] = useState(() => {
-        const savedSales = localStorage.getItem("sales");
-        return savedSales ? JSON.parse(savedSales) : [];
-    });
+    const [sales, setSales] = useState([]);
     const [editingSale, setEditingSale] = useState(null);
+    const [products, setProducts] = useState([]);
+    const [customers, setCustomers] = useState([]);
     const [newSale, setNewSale] = useState({
         customer: "",
         product: "",
         quantity: 1,
-        price: 0,
+        payment: "",
+        phone: "",
+        transactionCode: "",
     });
-    const [products, setProducts] = useState([]);
-    const [customers, setCustomers] = useState([]);
 
     useEffect(() => {
-        const loadData = async () => {
+        const loadSalesData = async () => {
             try {
-                const [salesData, customerData, productData] = await Promise.all([
-                    fetchSales(),
-                    fetchCustomers(),
+                const [productData, customerData, saleData] = await Promise.all([
                     fetchStocks(),
+                    fetchCustomers(),
+                    fetchSales(),
                 ]);
 
-                setSales(salesData);
-                setCustomers(customerData);
                 setProducts(productData);
-                localStorage.setItem("sales", JSON.stringify(salesData));
-                localStorage.setItem("customers", JSON.stringify(customerData));
+                setCustomers(customerData);
+                setSales(saleData);
                 localStorage.setItem("products", JSON.stringify(productData));
+                localStorage.setItem("customers", JSON.stringify(customerData));
+                localStorage.setItem("sales", JSON.stringify(saleData));
             } catch (error) {
-                setSales(JSON.parse(localStorage.getItem("sales")) || []);
-                setCustomers(JSON.parse(localStorage.getItem("customers")) || []);
                 setProducts(JSON.parse(localStorage.getItem("products")) || []);
+                setCustomers(JSON.parse(localStorage.getItem("customers")) || []);
+                setSales(JSON.parse(localStorage.getItem("sales")) || []);
             }
         };
 
-        loadData();
+        loadSalesData();
     }, []);
 
-    function getProductPrice(productName) {
+    const getProductPrice = (productName) => {
         const product = products.find((item) => item.name === productName);
-        return product ? Number(product.sellingPrice || product.price || 0) : 0;
-    }
+        return product ? Number(product.sellingPrice ?? 0) : 0;
+    };
 
-    function handleAddSale() {
+    const handleAddSale = () => {
         setEditingSale(null);
-        setNewSale({ customer: "", product: "", quantity: 1, price: 0 });
+        setNewSale({
+            customer: "",
+            product: "",
+            quantity: 1,
+            payment: "",
+            phone: "",
+            transactionCode: "",
+        });
         setShowForm(true);
-    }
+    };
 
-    function handleEdit(sale) {
+    const handleEdit = (sale) => {
         setNewSale({
             customer: sale.customer,
             product: sale.product,
             quantity: sale.quantity,
-            price: sale.price,
+            payment: sale.payment || "",
+            phone: sale.phone || "",
+            transactionCode: sale.transactionCode || "",
         });
 
         setEditingSale(sale);
         setShowForm(true);
-    }
+    };
 
-    async function handleSaveSale() {
-        if (!newSale.customer || !newSale.product || newSale.quantity <= 0) {
+    const handleCancel = () => {
+        setNewSale({
+            customer: "",
+            product: "",
+            quantity: 1,
+            payment: "",
+            phone: "",
+            transactionCode: "",
+        });
+        setEditingSale(null);
+        setShowForm(false);
+    };
+
+    const handleSaveSale = async () => {
+        if (!newSale.customer || !newSale.product || !newSale.payment || newSale.quantity <= 0) {
             alert("Please fill in all fields.");
             return;
         }
 
-        const price = getProductPrice(newSale.product);
+        if (newSale.payment === "M-Pesa" && !newSale.phone) {
+            alert("Please enter M-Pesa phone number.");
+            return;
+        }
+
+        if (newSale.payment === "Card" && !newSale.transactionCode) {
+            alert("Please enter card reference.");
+            return;
+        }
+
+        const selectedProduct = products.find((product) => product.name === newSale.product);
+        if (!selectedProduct) {
+            alert("Product not found.");
+            return;
+        }
+
+        if (!editingSale && Number(newSale.quantity) > Number(selectedProduct.stock ?? 0)) {
+            alert("Not enough stock available.");
+            return;
+        }
+
+        const productPrice = getProductPrice(newSale.product);
         const payload = {
             customer: newSale.customer,
             product: newSale.product,
             quantity: Number(newSale.quantity),
-            price,
-            total: price * Number(newSale.quantity),
+            price: productPrice,
+            total: productPrice * Number(newSale.quantity),
+            payment: newSale.payment,
+            phone: newSale.phone,
+            transactionCode: newSale.transactionCode,
+            paymentstatus: newSale.payment === "Cash" ? "Paid" : "Pending",
             date: new Date().toLocaleDateString(),
         };
 
         try {
             if (editingSale) {
-                const updatedSale = await updateSale(editingSale._id || editingSale.id, payload);
-                setSales((current) => current.map((sale) => (sale._id || sale.id) === (updatedSale._id || updatedSale.id) ? updatedSale : sale));
+                await updateSale(editingSale._id || editingSale.id, payload);
             } else {
-                const createdSale = await addSale(payload);
-                setSales((current) => [createdSale, ...current]);
+                await addSale(payload);
             }
+
+            const refreshedSales = await fetchSales();
+            setSales(refreshedSales);
+            localStorage.setItem("sales", JSON.stringify(refreshedSales));
+
+            const refreshedProducts = await fetchStocks();
+            setProducts(refreshedProducts);
+            localStorage.setItem("products", JSON.stringify(refreshedProducts));
         } catch (error) {
             alert(error.message || "Unable to save sale");
             return;
         }
 
-        setNewSale({ customer: "", product: "", quantity: 1, price: 0 });
-        setEditingSale(null);
-        setShowForm(false);
-    }
+        handleCancel();
+    };
 
-    async function handleDelete(id) {
+    const handleDelete = async (id) => {
         const confirmDelete = window.confirm("Are you sure you want to delete this sale?");
-
         if (!confirmDelete) {
             return;
         }
 
         try {
             await deleteSale(id);
-            setSales((current) => current.filter((sale) => (sale._id || sale.id) !== id));
+            const updatedSales = sales.filter((sale) => (sale._id || sale.id) !== id);
+            setSales(updatedSales);
+            localStorage.setItem("sales", JSON.stringify(updatedSales));
         } catch (error) {
             alert(error.message || "Unable to delete sale");
         }
-    }
-
-    function handleCancel() {
-        setNewSale({ customer: "", product: "", quantity: 1, price: 0 });
-        setEditingSale(null);
-        setShowForm(false);
-    }
+    };
 
     const totalSales = sales.length;
     const totalItems = sales.reduce((total, sale) => total + Number(sale.quantity || 0), 0);
@@ -135,7 +187,9 @@ function Sales() {
                     </div>
                 </div>
 
-                <button className="add-sales-btn" onClick={handleAddSale}>+ Add Sale</button>
+                <button className="add-sales-btn" onClick={handleAddSale}>
+                    + Add Sale
+                </button>
 
                 <div className="sales-summary">
                     <div className="summary-card">
@@ -169,6 +223,9 @@ function Sales() {
                                 <th>Quantity</th>
                                 <th>Price</th>
                                 <th>Total</th>
+                                <th>Payment</th>
+                                <th>Payment Status</th>
+                                <th>Reference</th>
                                 <th>Date</th>
                                 <th>Actions</th>
                             </tr>
@@ -177,21 +234,28 @@ function Sales() {
                         <tbody>
                             {sales.length === 0 ? (
                                 <tr>
-                                    <td colSpan="8">No sales data available.</td>
+                                    <td colSpan="11">No sales data available.</td>
                                 </tr>
                             ) : (
-                                sales.map((sale, index) => (
-                                    <tr key={sale._id || sale.id || index}>
-                                        <td>{index + 1}</td>
+                                sales.map((sale) => (
+                                    <tr key={sale._id || sale.id}>
+                                        <td>{sale.id}</td>
                                         <td>{sale.customer}</td>
                                         <td>{sale.product}</td>
                                         <td>{sale.quantity}</td>
                                         <td>KSh {sale.price}</td>
                                         <td>KSh {sale.total}</td>
+                                        <td>{sale.payment}</td>
+                                        <td>{sale.paymentstatus}</td>
+                                        <td>{sale.transactionCode || sale.phone}</td>
                                         <td>{sale.date}</td>
                                         <td>
-                                            <button className="edit-btn" onClick={() => handleEdit(sale)}>Edit</button>
-                                            <button className="delete-btn" onClick={() => handleDelete(sale._id || sale.id)}>Delete</button>
+                                            <button className="edit-btn" onClick={() => handleEdit(sale)}>
+                                                Edit
+                                            </button>
+                                            <button className="delete-btn" onClick={() => handleDelete(sale._id || sale.id)}>
+                                                Delete
+                                            </button>
                                         </td>
                                     </tr>
                                 ))
@@ -207,7 +271,10 @@ function Sales() {
 
                             <div className="form-group">
                                 <label>Customer</label>
-                                <select value={newSale.customer} onChange={(e) => setNewSale({ ...newSale, customer: e.target.value })}>
+                                <select
+                                    value={newSale.customer}
+                                    onChange={(e) => setNewSale({ ...newSale, customer: e.target.value })}
+                                >
                                     <option value="">Select Customer</option>
                                     {customers.map((customer) => (
                                         <option key={customer.id || customer._id} value={customer.name}>
@@ -219,7 +286,10 @@ function Sales() {
 
                             <div className="form-group">
                                 <label>Product</label>
-                                <select value={newSale.product} onChange={(e) => setNewSale({ ...newSale, product: e.target.value })}>
+                                <select
+                                    value={newSale.product}
+                                    onChange={(e) => setNewSale({ ...newSale, product: e.target.value })}
+                                >
                                     <option value="">Select Product</option>
                                     {products.map((product) => (
                                         <option key={product.id || product._id} value={product.name}>
@@ -231,12 +301,58 @@ function Sales() {
 
                             <div className="form-group">
                                 <label>Quantity</label>
-                                <input type="number" min="1" value={newSale.quantity} onChange={(e) => setNewSale({ ...newSale, quantity: Number(e.target.value) })} />
+                                <input
+                                    type="number"
+                                    min="1"
+                                    value={newSale.quantity}
+                                    onChange={(e) => setNewSale({ ...newSale, quantity: Number(e.target.value) })}
+                                />
                             </div>
 
+                            <div className="form-group">
+                                <label>Payment Method</label>
+                                <select
+                                    value={newSale.payment}
+                                    onChange={(e) => setNewSale({ ...newSale, payment: e.target.value })}
+                                >
+                                    <option value="">Select Payment</option>
+                                    <option value="Cash">Cash</option>
+                                    <option value="M-Pesa">M-Pesa</option>
+                                    <option value="Card">Card</option>
+                                </select>
+                            </div>
+
+                            {newSale.payment === "M-Pesa" && (
+                                <div className="form-group">
+                                    <label>Phone Number</label>
+                                    <input
+                                        type="text"
+                                        placeholder="254712345678"
+                                        value={newSale.phone}
+                                        onChange={(e) => setNewSale({ ...newSale, phone: e.target.value })}
+                                    />
+                                </div>
+                            )}
+
+                            {newSale.payment === "Card" && (
+                                <div className="form-group">
+                                    <label>Card Reference</label>
+                                    <input
+                                        type="text"
+                                        placeholder="Authorization Number"
+                                        value={newSale.transactionCode}
+                                        onChange={(e) => setNewSale({ ...newSale, transactionCode: e.target.value })}
+                                    />
+                                </div>
+                            )}
+
                             <div className="form-buttons">
-                                <button className="save-btn" onClick={handleSaveSale}>{editingSale ? "Update Sale" : "Save Sale"}</button>
-                                <button className="cancel-btn" onClick={handleCancel}>Cancel</button>
+                                <button className="save-btn" onClick={handleSaveSale}>
+                                    {editingSale ? "Update Sale" : "Save Sale"}
+                                </button>
+                                <button className="cancel-btn" onClick={handleCancel}>
+                                    Cancel
+                                </button>
                             </div>
                         </div>
                     </div>

@@ -1,0 +1,81 @@
+.customer-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.customer-header input {
+  flex: 1;
+  max-width: 420px;
+  padding: 0.7rem 1rem;
+  border-radius: 10px;
+  border: 1px solid #d1d5db;
+}
+
+.customer-header button,
+.customer-form button,
+.edit-button,
+.delete-button {
+  border: none;
+  border-radius: 10px;
+  padding: 0.7rem 1rem;
+  cursor: pointer;
+}
+
+.customer-header button,
+.customer-form button {
+  background: #2563eb;
+  color: white;
+}
+
+.customer-form {
+  margin-bottom: 1rem;
+}
+
+.customer-form > div {
+  background: white;
+  padding: 1.25rem;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(15, 23, 42, 0.04);
+}
+
+.customer-form input {
+  display: block;
+  width: 100%;
+  margin: 0.5rem 0;
+  padding: 0.75rem 1rem;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+}
+
+.table-container {
+  overflow-x: auto;
+}
+
+.customer-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.customer-table th,
+.customer-table td {
+  padding: 0.9rem 1rem;
+  border-bottom: 1px solid #e5e7eb;
+  text-align: left;
+}
+
+.edit-button {
+  background: #dbeafe;
+  color: #1d4ed8;
+  margin-right: 0.5rem;
+}
+
+.delete-button {
+  background: #fee2e2;
+  color: #b91c1c;
+}

@@ -27,6 +27,26 @@ const saleSchema = new mongoose.Schema(
       required: [true, "Total is required"],
       min: [0, "Total cannot be negative"],
     },
+    payment: {
+      type: String,
+      default: "Cash",
+      trim: true,
+    },
+    phone: {
+      type: String,
+      default: "",
+      trim: true,
+    },
+    transactionCode: {
+      type: String,
+      default: "",
+      trim: true,
+    },
+    paymentstatus: {
+      type: String,
+      enum: ["Pending", "Paid"],
+      default: "Pending",
+    },
     date: {
       type: String,
       default: () => new Date().toLocaleDateString(),

@@ -5,6 +5,7 @@ const connectDB = require("./config/db");
 const Stock = require("./models/stock");
 const Customer = require("./models/customer");
 const Sale = require("./models/sale");
+const Service = require("./models/service");
 
 dotenv.config();
 
@@ -227,6 +228,55 @@ app.delete("/api/customers/:id", async (req, res) => {
     }
 
     res.status(200).json({ message: "Customer deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+app.get("/api/services", async (req, res) => {
+  try {
+    const services = await Service.find().sort({ createdAt: -1 });
+    res.status(200).json(services);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+app.post("/api/services", async (req, res) => {
+  try {
+    const service = await Service.create(req.body);
+    res.status(201).json(service);
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+});
+
+app.put("/api/services/:id", async (req, res) => {
+  try {
+    const updated = await Service.findByIdAndUpdate(req.params.id, req.body, {
+      new: true,
+      runValidators: true,
+    });
+
+    if (!updated) {
+      return res.status(404).json({ message: "Service not found" });
+    }
+
+    res.status(200).json(updated);
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+});
+
+app.delete("/api/services/:id", async (req, res) => {
+  try {
+    const deleted = await Service.findByIdAndDelete(req.params.id);
+
+    if (!deleted) {
+      return res.status(404).json({ message: "Service not found" });
+    }
+
+    res.status(200).json({ message: "Service deleted successfully" });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
