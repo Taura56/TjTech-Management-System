@@ -1,15 +1,17 @@
-.layout-shell {
-  display: flex;
-  min-height: 100vh;
-  background: #f5f7fb;
+.layout {
+    display: flex;
+    min-height: 100vh;
+   
 }
 
-.layout-main {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
+.main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow-x: hidden;
 }
 
-.page-content {
-  padding: 1.5rem 2rem 2rem;
+.content {
+    flex:1;
+    padding: 20px;
 }

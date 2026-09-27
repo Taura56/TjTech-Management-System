@@ -1,40 +1,35 @@
-import { NavLink } from "react-router-dom";
 import "../css/sidebar.css";
+import { NavLink } from "react-router-dom";
+function Sidebar(){
+    return(
+        <div className="sidebar">
+            <h2>TJ Tech Management System</h2>
+            <ul>
+                <li>
+                    <NavLink to="/">Dashboard</NavLink>
+                </li>
+                                <li>
+                    <NavLink to="/services">Services</NavLink>
+                </li>
+                <li>
+                    <NavLink to="/products">Products</NavLink>
+                </li>
+                <li>
+                    <NavLink to="/customers">Customers</NavLink>
+                </li>
+                
+                <li>
+                    <NavLink to="/sales">Sales</NavLink>
+                </li>
 
-const navItems = [
-  { label: "Dashboard", path: "/dashboard" },
-  { label: "Products", path: "/products" },
-  { label: "Customers", path: "/customers" },
-  { label: "Sales", path: "/sales" },
-  { label: "Payments", path: "/payments" },
-  { label: "Services", path: "/services" },
-  { label: "Reports", path: "/report" },
-];
-
-function Sidebar() {
-  return (
-    <aside className="sidebar">
-      <div className="brand">
-        <span className="brand__logo">TJ</span>
-        <div>
-          <strong>TJ Tech</strong>
-          <small>Management</small>
+                <li>
+                    <NavLink to="/payments">Payments</NavLink>
+                </li>
+                <li>
+                    <NavLink to="/reports">Reports</NavLink>
+                </li>
+            </ul>
         </div>
-      </div>
-
-      <nav className="nav">
-        {navItems.map((item) => (
-          <NavLink
-            key={item.path}
-            to={item.path}
-            className={({ isActive }) => (isActive ? "nav-link active" : "nav-link")}
-          >
-            {item.label}
-          </NavLink>
-        ))}
-      </nav>
-    </aside>
-  );
+    );
 }
-
 export default Sidebar;

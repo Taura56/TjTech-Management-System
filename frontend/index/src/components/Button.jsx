@@ -1,9 +1,6 @@
-function Button({ children, className = "", ...props }) {
-  return (
-    <button className={className} {...props}>
-      {children}
-    </button>
-  );
+function Button({text}){
+    return(
+        <button>{text}</button>
+    );
 }
-
 export default Button;

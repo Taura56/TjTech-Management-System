@@ -1,42 +1,20 @@
-.topbar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 1.25rem 2rem;
-  background: #fff;
-  border-bottom: 1px solid #edf2f7;
+.navbar {
+    height: 70px;
+    background: white;
+    border-bottom: 1px solid #ddd;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding:0 20px;
 }
-
-.topbar__eyebrow {
-  margin: 0 0 0.25rem;
-  color: #6b7280;
-  font-size: 0.72rem;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+.navbar h2 {
+    
+    font-size: 28px;
+    margin: 0;
+   
 }
-
-.topbar h1 {
-  margin: 0;
-  font-size: 1.7rem;
-}
-
-.topbar__user {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  background: #f3f4f6;
-  padding: 0.6rem 0.9rem;
-  border-radius: 999px;
-  font-weight: 600;
-}
-
-.avatar {
-  display: inline-flex;
-  width: 2rem;
-  height: 2rem;
-  border-radius: 50%;
-  align-items: center;
-  justify-content: center;
-  background: #1d4ed8;
-  color: white;
+.profile {
+    display: flex;
+    align-items: center;
+    gap: 10px;
 }
