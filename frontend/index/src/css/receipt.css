@@ -1,0 +1,35 @@
+.receipt-page{
+
+    width:300px;
+    margin:5px;
+    font-family:Arial;
+
+}
+
+
+.receipt{
+
+    border:1px solid black;
+    padding:10px;
+    text-align:center;
+
+}
+
+
+.print-btn{
+
+    margin-bottom:20px;
+    padding:10px 20px;
+
+}
+
+
+@media print{
+
+.print-btn{
+
+    display:none;
+
+}
+
+}

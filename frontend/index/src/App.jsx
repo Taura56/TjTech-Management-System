@@ -7,6 +7,8 @@ import Report from "./pages/Report";
 import Sales from "./pages/Sales";
 import Payments from "./pages/Payments";
 import Services from "./pages/Services";
+import JobCard from "./pages/JobCard";
+import Receipt from "./pages/Receipt";
 function App(){
   return(
     <BrowserRouter>
@@ -31,6 +33,13 @@ function App(){
 
       <Route path="/services"
       element = {<Services/>}/>
+      
+      <Route path="/jobcard"
+      element = {<JobCard/>}/>
+      
+      <Route path="/receipt"
+      element = {<Receipt/>}/>
+
     </Routes>
     </BrowserRouter>
     )

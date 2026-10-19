@@ -1,10 +1,4 @@
-const API_BASE = (() => {
-    if (typeof window !== "undefined" && window.location && window.location.hostname) {
-        return `${window.location.protocol}//${window.location.hostname}:5000`;
-    }
-
-    return "http://localhost:5000";
-})();
+const API_BASE = "http://192.168.183.216:5000";
 
 const STOCK_URL = `${API_BASE}/api/stocks`;
 const CUSTOMER_URL = `${API_BASE}/api/customers`;
